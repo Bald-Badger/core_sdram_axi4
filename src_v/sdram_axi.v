@@ -102,6 +102,17 @@ wire [ 31:0]  ram_read_data_w;
 wire [  7:0]  ram_len_w;
 wire          ram_ack_w;
 wire          ram_error_w;
+    
+reg           inport_wready_o_ff;
+wire          inport_wready_o_ff_wire;
+assign        inport_wready_o = inport_wready_o_ff;
+
+always @(posedge clk_i or posedge rst_i) begin : delay_wready
+    if (rst_i)
+        inport_wready_o_ff <= 1'b0;
+    else
+        inport_wready_o_ff <= inport_wready_o_ff_wire;
+end
 
 sdram_axi_pmem
 u_axi
@@ -127,7 +138,7 @@ u_axi
     .axi_arburst_i(inport_arburst_i),
     .axi_rready_i(inport_rready_i),
     .axi_awready_o(inport_awready_o),
-    .axi_wready_o(inport_wready_o),
+    .axi_wready_o(inport_wready_o_ff_wire),
     .axi_bvalid_o(inport_bvalid_o),
     .axi_bresp_o(inport_bresp_o),
     .axi_bid_o(inport_bid_o),
